@@ -39,7 +39,7 @@ public class MainUI extends JPanel {
 
         // Add the board to the middle of the screen as fullwidth
         board = new Board();
-        board.load(savePath);
+        board.load(savePath + "kchess.sav");
         c.gridx = 0;
         c.gridwidth = 2;
         c.gridy = 1;
@@ -70,28 +70,24 @@ public class MainUI extends JPanel {
         add(controls);
 
         JButton exit = new JButton("Exit");
-        c.gridx = 0;
-        c.gridy = 3;
-        exit.addActionListener(e -> {board.save(savePath); exitHook.exit();});
+        exit.addActionListener(e -> {board.save(savePath + "kchess.sav"); exitHook.exit();});
         controls.add(exit);
 
         JButton reset = new JButton("Reset");
-        c.gridx = 1;
-        c.gridy = 3;
         reset.addActionListener(e -> board.resetBoard());
         controls.add(reset);
 
         JButton back = new JButton("Back");
-        c.gridx = 0;
-        c.gridy = 4;
         back.addActionListener(e -> board.movePast());
         controls.add(back);
 
         JButton forward = new JButton("Forward");
-        c.gridx = 1;
-        c.gridy = 4;
         forward.addActionListener(e -> board.moveFuture());
         controls.add(forward);
+
+        JButton save = new JButton("Save");
+        save.addActionListener(e -> { String fn = Util.rollSaveFilename(savePath, "out"); board.save(fn); });
+        controls.add(save);
 
         // Set up the UI
         this.setLayout(layout);

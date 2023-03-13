@@ -479,9 +479,11 @@ public class Board extends JPanel implements MouseListener {
     }
 
     public void save(String fileName) {
-        // Create a save file called kchess.sav and write the past and future moves to it separated by a hyphen
+        // Create a save file called fileName and write the past and future moves to it separated by a hyphen
         try {
-            FileWriter saveFile = new FileWriter(fileName);
+            File file = new File(fileName);
+            file.createNewFile();
+            FileWriter saveFile = new FileWriter(file);
 
             for (Square[] row : squares) {
                 for (Square square : row) {
@@ -504,7 +506,7 @@ public class Board extends JPanel implements MouseListener {
     }
 
     public void load(String fileName) {
-        // Load a save file called kchess.sav defined as per above and load values from it
+        // Load a save file called fileName defined as per above and load values from it
         try {
             Scanner saveFile = new Scanner(new File(fileName));
 
