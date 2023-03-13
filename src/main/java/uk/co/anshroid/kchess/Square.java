@@ -45,7 +45,8 @@ public class Square extends JPanel {
 
     /**
      * Create a new Square object
-     * @param pos The position of the square
+     *
+     * @param pos    The position of the square
      * @param parent The parent board
      */
     public Square(Util.Tuple<Integer, Integer> pos, Board parent) {
@@ -96,17 +97,18 @@ public class Square extends JPanel {
 
         if (dot) {
             g.setColor(Color.LIGHT_GRAY);
-            g.fillOval((getWidth()-dotSize)/2, (getHeight()-dotSize)/2, dotSize, dotSize);
+            g.fillOval((getWidth() - dotSize) / 2, (getHeight() - dotSize) / 2, dotSize, dotSize);
         }
 
         if (check) {
             g.setColor(Color.LIGHT_GRAY);
-            g.fillOval((getWidth()-dotSize)/2, (getHeight()-dotSize)/2, dotSize, dotSize);
+            g.fillOval((getWidth() - dotSize) / 2, (getHeight() - dotSize) / 2, dotSize, dotSize);
         }
     }
 
     /**
      * Set whether a dot is present on the square
+     *
      * @param dot Whether a dot is present
      */
     public void setDot(boolean dot) {
@@ -116,6 +118,7 @@ public class Square extends JPanel {
 
     /**
      * Set whether the square is in check
+     *
      * @param check Whether the square is in check
      */
     public void setCheck(boolean check) {
@@ -125,6 +128,7 @@ public class Square extends JPanel {
 
     /**
      * Set the piece on the square
+     *
      * @param piece The piece to set
      */
     public void setPiece(int piece) {
@@ -137,157 +141,169 @@ public class Square extends JPanel {
 
     /**
      * Get all legal moves for the piece on this square
+     *
      * @return An array of legal moves
      */
-     public ArrayList<Util.Tuple<Integer, Integer>> getLegalMoves() {
+    public ArrayList<Util.Tuple<Integer, Integer>> getLegalMoves() {
         ArrayList<Util.Tuple<Integer, Integer>> moves = new ArrayList<>();
         Util.Tuple<Integer, Integer> move;
 
-         switch (piece) {
-             case 2: // Pawn
-             case 4:
-                 int forward = isWhite() ? 1 : -1; // The direction the pawn moves in
-                 move = new Util.Tuple<>(pos.x(), pos.y() + forward); // Check 1s^
-                 if (Board.isOnBoard(move) && board.getPieceAt(move) == -1) { // Check the target is on the board and empty
-                     moves.add(move); // Add the move
+        switch (piece) {
+            case 2: // Pawn
+            case 4:
+                int forward = isWhite() ? 1 : -1; // The direction the pawn moves in
+                move = new Util.Tuple<>(pos.x(), pos.y() + forward); // Check 1s^
+                if (Board.isOnBoard(move) && board.getPieceAt(move) == -1) { // Check the target is on the board and empty
+                    moves.add(move); // Add the move
 
-                     move = new Util.Tuple<>(pos.x(), pos.y() + (2 * forward)); // Check 2s^
-                     if (pos.y() == (isWhite() ? 2 : 7) && board.getPieceAt(move) == -1) { // Check the pawn is in the correct position and the target is empty
-                         moves.add(move); // Add the move
-                     }
-                 }
-                 move = new Util.Tuple<>(pos.x() + 1, pos.y() + forward); // Check takes to the right
-                 // Check the target is on the board and contains an enemy piece
-                 if (Board.isOnBoard(move) && board.getPieceAt(move) != -1 && (isWhite(board.getPieceAt(move)) != isWhite())) {
-                     moves.add(move); // Add the move
-                 }
-                 move = new Util.Tuple<>(pos.x() - 1, pos.y() + forward); // Check takes to the left
-                 // Check the target is on the board and contains an enemy piece
-                 if (Board.isOnBoard(move) && board.getPieceAt(move) != -1 && (isWhite(board.getPieceAt(move)) != isWhite())) {
-                     moves.add(move);
-                 }
+                    move = new Util.Tuple<>(pos.x(), pos.y() + (2 * forward)); // Check 2s^
+                    if (pos.y() == (isWhite() ? 2 : 7) && board.getPieceAt(move) == -1) { // Check the pawn is in the correct position and the target is empty
+                        moves.add(move); // Add the move
+                    }
+                }
+                move = new Util.Tuple<>(pos.x() + 1, pos.y() + forward); // Check takes to the right
+                // Check the target is on the board and contains an enemy piece
+                if (Board.isOnBoard(move) && board.getPieceAt(move) != -1 && (isWhite(board.getPieceAt(move)) != isWhite())) {
+                    moves.add(move); // Add the move
+                }
+                move = new Util.Tuple<>(pos.x() - 1, pos.y() + forward); // Check takes to the left
+                // Check the target is on the board and contains an enemy piece
+                if (Board.isOnBoard(move) && board.getPieceAt(move) != -1 && (isWhite(board.getPieceAt(move)) != isWhite())) {
+                    moves.add(move);
+                }
 
-                 move = new Util.Tuple<>(pos.x() + 1, pos.y() + forward); // Check en passant to the right
-                 // Check the target is on the board and contains an enemy pawn
-                 if (Board.isOnBoard(move) && board.getPieceAt(new Util.Tuple<>(pos.x() + 1, pos.y())) == (isWhite() ? 4 : 2) && board.getSquareAt(move).enPassant) {
-                     moves.add(move); // Add the move
-                 }
+                move = new Util.Tuple<>(pos.x() + 1, pos.y() + forward); // Check en passant to the right
+                // Check the target is on the board and contains an enemy pawn
+                if (Board.isOnBoard(move) && board.getPieceAt(new Util.Tuple<>(pos.x() + 1, pos.y())) == (isWhite() ? 4 : 2) && board.getSquareAt(move).enPassant) {
+                    moves.add(move); // Add the move
+                }
 
                 move = new Util.Tuple<>(pos.x() - 1, pos.y() + forward); // Check en passant to the left
                 // Check the target is on the board and contains an enemy pawn
                 if (Board.isOnBoard(move) && board.getPieceAt(new Util.Tuple<>(pos.x() - 1, pos.y())) == (isWhite() ? 4 : 2) && board.getSquareAt(move).enPassant) {
                     moves.add(move); // Add the move
                 }
-                 break;
-             case 3: // King
-             case 6:
-                 for (Util.Tuple<Integer, Integer> offset : new Util.Tuple[]{
-                         new Util.Tuple<>(-1, -1), new Util.Tuple<>(0, -1), new Util.Tuple<>(1, -1),
-                         new Util.Tuple<>(-1, 0), new Util.Tuple<>(1, 0),
-                         new Util.Tuple<>(-1, 1), new Util.Tuple<>(0, 1), new Util.Tuple<>(1, 1)
-                 }) {
-                     offset = new Util.Tuple<>(pos.x() + offset.x(), pos.y() + offset.y()); // Add the offset to the current position
-                     if (Board.isOnBoard(offset) && (board.getPieceAt(offset) == -1 || isWhite(board.getPieceAt(offset)) != isWhite())) { // Check the target is on the board and either empty or contains an enemy piece
-                         moves.add(offset); // Add the move
-                     }
-                 }
-
-                 if (board.kingsideCastling.get(isWhite())) {
-                     for (Util.Tuple<Integer, Integer> obstruction : new Util.Tuple[]{
-                             new Util.Tuple<>(pos.x() + 1, pos.y()),
-                             new Util.Tuple<>(pos.x() + 2, pos.y())
-                     }) {
-                         if (board.getPieceAt(obstruction) != -1 && !board.computeChecks(isWhite(), obstruction)) {
-
-                             break;
-                         }
-                     }
-
-                     if (board.getPieceAt(new Util.Tuple<>(pos.x() + 1, pos.y())) == -1 && board.getPieceAt(new Util.Tuple<>(pos.x() + 2, pos.y())) == -1) {
-                         moves.add(new Util.Tuple<>(pos.x() + 2, pos.y()));
-                     }
-                 }
-
-                if (board.queensideCastling.get(isWhite())) {
-                        if (board.getPieceAt(new Util.Tuple<>(pos.x() - 1, pos.y())) == -1 && board.getPieceAt(new Util.Tuple<>(pos.x() - 2, pos.y())) == -1 && board.getPieceAt(new Util.Tuple<>(pos.x() - 3, pos.y())) == -1) {
-                            moves.add(new Util.Tuple<>(pos.x() - 2, pos.y()));
-                        }
+                break;
+            case 3: // King
+            case 6:
+                for (Util.Tuple<Integer, Integer> offset : new Util.Tuple[]{
+                        new Util.Tuple<>(-1, -1), new Util.Tuple<>(0, -1), new Util.Tuple<>(1, -1),
+                        new Util.Tuple<>(-1, 0), new Util.Tuple<>(1, 0),
+                        new Util.Tuple<>(-1, 1), new Util.Tuple<>(0, 1), new Util.Tuple<>(1, 1)
+                }) {
+                    offset = new Util.Tuple<>(pos.x() + offset.x(), pos.y() + offset.y()); // Add the offset to the current position
+                    if (Board.isOnBoard(offset) && (board.getPieceAt(offset) == -1 || isWhite(board.getPieceAt(offset)) != isWhite())) { // Check the target is on the board and either empty or contains an enemy piece
+                        moves.add(offset); // Add the move
+                    }
                 }
 
+                if (!check) {
+                    if (board.kingsideCastling.get(isWhite())) {
+                        boolean obstructed = false;
+                        for (Util.Tuple<Integer, Integer> obstruction : new Util.Tuple[]{
+                                new Util.Tuple<>(pos.x() + 1, pos.y()),
+                                new Util.Tuple<>(pos.x() + 2, pos.y())
+                        }) {
+                            if (board.getPieceAt(obstruction) != -1 || board.computeChecks(isWhite(), obstruction)) {
+                                obstructed = true;
+                            }
+                        }
+
+                        if (!obstructed) {
+                            moves.add(new Util.Tuple<>(pos.x() + 2, pos.y()));
+                        }
+                    }
+
+                    if (board.queensideCastling.get(isWhite())) {
+                        boolean obstructed = false;
+                        for (Util.Tuple<Integer, Integer> obstruction : new Util.Tuple[]{
+                                new Util.Tuple<>(pos.x() - 1, pos.y()),
+                                new Util.Tuple<>(pos.x() - 2, pos.y())
+                        }) {
+                            if (board.getPieceAt(obstruction) != -1 || board.computeChecks(isWhite(), obstruction)) {
+                                obstructed = true;
+                            }
+                        }
+
+                        if (!obstructed) {
+                            moves.add(new Util.Tuple<>(pos.x() - 2, pos.y()));
+                        }
+                    }
+                }
                 break;
-             case 5: // Queen
-             case 10:
-                 for (Util.Tuple<Integer, Integer> offset : new Util.Tuple[]{
-                         new Util.Tuple<>(-1, -1), new Util.Tuple<>(0, -1), new Util.Tuple<>(1, -1),
-                         new Util.Tuple<>(-1, 0), new Util.Tuple<>(1, 0),
-                         new Util.Tuple<>(-1, 1), new Util.Tuple<>(0, 1), new Util.Tuple<>(1, 1)
-                 }) {
-                     CheckDirection(moves, offset);
-                 }
-                 break;
-             case 7: // Bishop
-             case 14:
-                 for (Util.Tuple<Integer, Integer> offset : new Util.Tuple[]{
-                         new Util.Tuple<>(-1, -1), new Util.Tuple<>(1, -1),
-                         new Util.Tuple<>(-1, 1), new Util.Tuple<>(1, 1)
-                 }) {
-                     CheckDirection(moves, offset);
-                 }
-                 break;
-             case 11: // Knight
-             case 22:
-                 for (Util.Tuple<Integer, Integer> l : new Util.Tuple[]{
-                         new Util.Tuple<>(2, 1),
-                         new Util.Tuple<>(2, -1),
-                         new Util.Tuple<>(-2, 1),
-                         new Util.Tuple<>(-2, -1),
-                         new Util.Tuple<>(1, 2),
-                         new Util.Tuple<>(-1, 2),
-                         new Util.Tuple<>(1, -2),
-                         new Util.Tuple<>(-1, -2)
-                 }) {
-                     move = new Util.Tuple<>(pos.x() + l.x(), pos.y() + l.y());
-                     if (Board.isOnBoard(move) && (board.getPieceAt(move) == -1 || isWhite(board.getPieceAt(move)) != isWhite())) {
-                         moves.add(move);
-                     }
-                 }
-                 break;
-             case 13: // Rook
-             case 26:
-                 for (Util.Tuple<Integer, Integer> offset : new Util.Tuple[]{
-                         new Util.Tuple<>(1, 0),
-                         new Util.Tuple<>(-1, 0),
-                         new Util.Tuple<>(0, 1),
-                         new Util.Tuple<>(0, -1)
-                 }) {
-                     CheckDirection(moves, offset);
-                 }
-                 break;
-         }
+            case 5: // Queen
+            case 10:
+                for (Util.Tuple<Integer, Integer> offset : new Util.Tuple[]{
+                        new Util.Tuple<>(-1, -1), new Util.Tuple<>(0, -1), new Util.Tuple<>(1, -1),
+                        new Util.Tuple<>(-1, 0), new Util.Tuple<>(1, 0),
+                        new Util.Tuple<>(-1, 1), new Util.Tuple<>(0, 1), new Util.Tuple<>(1, 1)
+                }) {
+                    CheckDirection(moves, offset);
+                }
+                break;
+            case 7: // Bishop
+            case 14:
+                for (Util.Tuple<Integer, Integer> offset : new Util.Tuple[]{
+                        new Util.Tuple<>(-1, -1), new Util.Tuple<>(1, -1),
+                        new Util.Tuple<>(-1, 1), new Util.Tuple<>(1, 1)
+                }) {
+                    CheckDirection(moves, offset);
+                }
+                break;
+            case 11: // Knight
+            case 22:
+                for (Util.Tuple<Integer, Integer> l : new Util.Tuple[]{
+                        new Util.Tuple<>(2, 1),
+                        new Util.Tuple<>(2, -1),
+                        new Util.Tuple<>(-2, 1),
+                        new Util.Tuple<>(-2, -1),
+                        new Util.Tuple<>(1, 2),
+                        new Util.Tuple<>(-1, 2),
+                        new Util.Tuple<>(1, -2),
+                        new Util.Tuple<>(-1, -2)
+                }) {
+                    move = new Util.Tuple<>(pos.x() + l.x(), pos.y() + l.y());
+                    if (Board.isOnBoard(move) && (board.getPieceAt(move) == -1 || isWhite(board.getPieceAt(move)) != isWhite())) {
+                        moves.add(move);
+                    }
+                }
+                break;
+            case 13: // Rook
+            case 26:
+                for (Util.Tuple<Integer, Integer> offset : new Util.Tuple[]{
+                        new Util.Tuple<>(1, 0),
+                        new Util.Tuple<>(-1, 0),
+                        new Util.Tuple<>(0, 1),
+                        new Util.Tuple<>(0, -1)
+                }) {
+                    CheckDirection(moves, offset);
+                }
+                break;
+        }
 
-         // Check each move for check-legality
-         for (Util.Tuple<Integer, Integer> move1 : (ArrayList<Util.Tuple<Integer, Integer>>) moves.clone()) {
-             int to = board.getPieceAt(move1); // Temporarily store the piece at the target square
-             int from = piece; // Temporarily store the piece on this square
+        // Check each move for check-legality
+        for (Util.Tuple<Integer, Integer> move1 : (ArrayList<Util.Tuple<Integer, Integer>>) moves.clone()) {
+            int to = board.getPieceAt(move1); // Temporarily store the piece at the target square
+            int from = piece; // Temporarily store the piece on this square
 
-             board.getSquareAt(move1).piece = piece; // Temporarily move the piece
-             if (piece == 3 || piece == 6) {
-                 board.kings.put(isWhite(piece), board.getSquareAt(move1));
-             }
-             piece = -1;
+            board.getSquareAt(move1).piece = piece; // Temporarily move the piece
+            if (piece == 3 || piece == 6) {
+                board.kings.put(isWhite(piece), board.getSquareAt(move1));
+            }
+            piece = -1;
 
-             if (board.computeChecks(isWhite(from), board.kings.get(isWhite(from)).pos)) { // Check if the move puts the player in check
-                 moves.remove(move1); // Remove the move if it does
-             }
+            if (board.computeChecks(isWhite(from), board.kings.get(isWhite(from)).pos)) { // Check if the move puts the player in check
+                moves.remove(move1); // Remove the move if it does
+            }
 
-             board.getSquareAt(move1).piece = to;
-             piece = from; // Undo the temporary move
-             if (piece == 3 || piece == 6) {
-                 board.kings.put(isWhite(piece), this);
-             }
-         }
-         repaint();
-         return moves;
+            board.getSquareAt(move1).piece = to;
+            piece = from; // Undo the temporary move
+            if (piece == 3 || piece == 6) {
+                board.kings.put(isWhite(piece), this);
+            }
+        }
+        repaint();
+        return moves;
     }
 
     private void CheckDirection(ArrayList<Util.Tuple<Integer, Integer>> moves, Util.Tuple<Integer, Integer> offset) {
@@ -307,6 +323,7 @@ public class Square extends JPanel {
 
     /**
      * Check if the piece on this square is white
+     *
      * @return Whether the piece is white
      */
     public boolean isWhite() {
@@ -315,6 +332,7 @@ public class Square extends JPanel {
 
     /**
      * Check if the given piece is white
+     *
      * @param type The piece type
      * @return Whether the piece is white
      */
@@ -338,7 +356,7 @@ public class Square extends JPanel {
         for (int i : new int[]{2, 3, 4, 5, 6, 7, 10, 11, 13, 14, 22, 26}) {
             try {
 //                 Load the sprite and scale it to the correct size (only works on desktop)
-                 sprites.put(i, ImageIO.read(Objects.requireNonNull(Square.class.getResource("/" + i + ".png"))).getScaledInstance(size, size, Image.SCALE_SMOOTH));
+                sprites.put(i, ImageIO.read(Objects.requireNonNull(Square.class.getResource("/" + i + ".png"))).getScaledInstance(size, size, Image.SCALE_SMOOTH));
 
             } catch (IOException e) {
                 e.printStackTrace();
