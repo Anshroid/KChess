@@ -423,6 +423,9 @@ public class Board extends JPanel implements MouseListener {
 
         if (past.size() == 0) return;
 
+        clearDots();
+        selectedPiece = null;
+
         String moveStr = past.get(past.size() - 1);
 
         String[] parts = moveStr.split("m");
@@ -479,6 +482,9 @@ public class Board extends JPanel implements MouseListener {
 
         if (future.size() == 0) return;
 
+        clearDots();
+        selectedPiece = null;
+
         String moveStr = future.get(future.size() - 1);
 
         String[] parts = moveStr.split("m");
@@ -526,6 +532,9 @@ public class Board extends JPanel implements MouseListener {
 
         whiteTurn = !whiteTurn;
 
+        endTurn();
+        repaint();
+
         past.add(moveStr);
         future.remove(future.size() - 1);
     }
@@ -534,6 +543,7 @@ public class Board extends JPanel implements MouseListener {
         // Create a save file called fileName and write the past and future moves to it separated by a hyphen
         try {
             File file = new File(fileName);
+            //noinspection ResultOfMethodCallIgnored
             file.createNewFile();
             FileWriter saveFile = new FileWriter(file);
 
