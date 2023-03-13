@@ -19,6 +19,9 @@ public class Board extends JPanel implements MouseListener {
     private Square selectedPiece = null;
     private boolean whiteTurn = true;
     private boolean turnIsInCheck = false;
+    private boolean promoting = false;
+    private Square promotionSquare;
+
     public final HashMap<Boolean, Square> kings = new HashMap<>();
 
     public final HashMap<Boolean, Boolean> kingsideCastling = new HashMap<>();
@@ -55,6 +58,8 @@ public class Board extends JPanel implements MouseListener {
      */
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (promoting) return;
+
         Square square = (Square) e.getSource();
         boolean squareHasPiece = square.piece != -1;
         boolean pieceIsSelected = selectedPiece != null;
@@ -114,22 +119,16 @@ public class Board extends JPanel implements MouseListener {
 
             // Check for pawn promotion
             if (square.piece == (whiteTurn ? 2 : 4) && square.pos.y() == (whiteTurn ? 8 : 1)) {
-                square.setPiece(whiteTurn ? 5 : 10);
+                promoting = true;
+                promotionSquare = square;
+                ((MainUI) getParent()).showPromotionMenu();
+                return;
             }
 
             // End the turn
             whiteTurn = !whiteTurn;
             endTurn();
-            if (turnIsInCheck) {
-                for (Square[] row : squares) {
-                        for (Square piece : row) {
-                            if (piece.isWhite() == whiteTurn && piece.getLegalMoves().size() > 0) {
-                                return;
-                            }
-                        }
-                }
-                ((MainUI) getParent()).endGame(whiteTurn);
-            }
+            checkMate();
             return;
         }
 
@@ -146,6 +145,51 @@ public class Board extends JPanel implements MouseListener {
             selectedPiece = null;
             clearDots();
         }
+    }
+
+    /**
+     * Check if it is a checkmate
+     */
+    private void checkMate() {
+        if (turnIsInCheck) {
+            for (Square[] row : squares) {
+                    for (Square piece : row) {
+                        if (piece.isWhite() == whiteTurn && piece.getLegalMoves().size() > 0) {
+                            return;
+                        }
+                    }
+            }
+            ((MainUI) getParent()).endGame(whiteTurn);
+        }
+    }
+
+    /**
+     * Promote a pawn
+     * @param piece The piece to promote to
+     */
+    public void promote(String piece) {
+        switch (piece) {
+            case "♛":
+                promotionSquare.setPiece(whiteTurn ? 5 : 10);
+                break;
+            case "♜":
+                promotionSquare.setPiece(whiteTurn ? 13 : 26);
+                break;
+            case "♝":
+                promotionSquare.setPiece(whiteTurn ? 7 : 14);
+                break;
+            case "♞":
+                promotionSquare.setPiece(whiteTurn ? 11 : 22);
+                break;
+        }
+
+        past.set(past.size() - 1, past.get(past.size() - 1) + "p" + promotionSquare.piece);
+
+        promoting = false;
+        promotionSquare = null;
+        whiteTurn = !whiteTurn;
+        endTurn();
+        checkMate();
     }
 
     private void endTurn() {
@@ -375,6 +419,8 @@ public class Board extends JPanel implements MouseListener {
     }
 
     public void movePast() {
+        if (promoting) return;
+
         if (past.size() == 0) return;
 
         String moveStr = past.get(past.size() - 1);
@@ -429,6 +475,8 @@ public class Board extends JPanel implements MouseListener {
     }
 
     public void moveFuture() {
+        if (promoting) return;
+
         if (future.size() == 0) return;
 
         String moveStr = future.get(future.size() - 1);
@@ -470,6 +518,10 @@ public class Board extends JPanel implements MouseListener {
 
         if (to[1].contains("e")) {
             getSquareAt(new Util.Tuple<>(Integer.parseInt(toPos[0]), Integer.parseInt(fromPos[1]))).setPiece(-1);
+        }
+
+        if (to[1].contains("p")) {
+            getSquareAt(new Util.Tuple<>(Integer.parseInt(toPos[0]), Integer.parseInt(toPos[1]))).setPiece(Integer.parseInt(String.valueOf(to[1].charAt(to[1].length()-1))));
         }
 
         whiteTurn = !whiteTurn;

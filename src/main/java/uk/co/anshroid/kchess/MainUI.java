@@ -10,6 +10,9 @@ public class MainUI extends JPanel {
     public final Board board;
     public final Timer Player2Timer;
     public final Timer Player1Timer;
+
+    public final JButton[] promotionButtons;
+
     public static Dimension size;
 
     /**
@@ -61,11 +64,31 @@ public class MainUI extends JPanel {
         layout.setConstraints(Player1Timer, c);
         add(Player1Timer);
 
+        // Add promotions to the left of the screen above the board
+        JPanel promotions = new JPanel();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.WEST;
+        layout.setConstraints(promotions, c);
+        add(promotions);
+
+        promotionButtons = new JButton[] {new JButton("♛"), new JButton("♜"), new JButton("♝"), new JButton("♞")};
+        for (JButton button : promotionButtons) {
+            button.addActionListener(e -> {
+                board.promote(button.getText());
+                for (JButton b : promotionButtons) {
+                    b.setEnabled(false);
+                }
+            });
+            button.setEnabled(false);
+            promotions.add(button);
+        }
+
+        // Add controls to the left of the screen under the board
         JPanel controls = new JPanel();
         c.gridx = 0;
         c.gridy = 2;
         c.anchor = GridBagConstraints.WEST;
-        c.gridheight = 2;
         layout.setConstraints(controls, c);
         add(controls);
 
@@ -95,8 +118,21 @@ public class MainUI extends JPanel {
         root.add(this);
     }
 
+    /**
+     * Set the timer text after the game has been won
+     * @param side The side that won the game
+     */
     public void endGame(Boolean side) {
         (side ? Player2Timer : Player1Timer).setText("WINNER");
         (side ? Player1Timer : Player2Timer).setText("GGWP");
+    }
+
+    /**
+     * Show the promotion menu
+     */
+    public void showPromotionMenu() {
+        for (JButton button : promotionButtons) {
+            button.setEnabled(true);
+        }
     }
 }
