@@ -158,7 +158,7 @@ for line in lines[12:]:
 		movetext += "O-O " if tosquare[0] == "g" else "O-O-O "
 		continue
 
-	movetext += frompiece + takes + tosquare + " "
+	movetext += frompiece + takes + tosquare + ("=" + pieces[int(_to[1].split("p")[1])] if "p" in _to[1] else "") + " "
 
 print(f"""
 [Event "Casual Correspondence game"]
