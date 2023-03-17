@@ -32,6 +32,9 @@ public class MainScreen {
         mainExitHook = exitHook;
         MainScreen.savePath = savePath;
 
+        //noinspection ResultOfMethodCallIgnored
+        new File(savePath).mkdirs();
+
         if (!Util.isKindle()) {
             // Use a default screen size for desktop
             root.setSize(new Dimension(536, 721));
@@ -49,20 +52,15 @@ public class MainScreen {
         log.info("Started");
     }
 
-    public void LoadMainUI() {
+    public void LoadMainUI(File saveFile) {
         root.remove(currentUI);
         currentUI = new MainUI(() -> {
             root.remove(currentUI);
             currentUI = new HomeUI(mainExitHook, savePath, this::LoadMainUI);
             root.add(currentUI);
             root.validate();
-        }, new Board(root.getSize()));
+        }, Board.load(saveFile, root.getSize()));
         root.add(currentUI);
         root.validate();
-    }
-
-    public void LoadMainUI(File saveFile) {
-        LoadMainUI();
-        ((MainUI) currentUI).board.load(saveFile);
     }
 }

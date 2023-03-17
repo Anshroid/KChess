@@ -17,6 +17,11 @@ import java.util.*;
 public class Board extends JPanel implements MouseListener {
     public static Dimension rootSize;
 
+    public String destinationFile;
+    public String player1;
+    public String player2;
+    public int result;
+
     public final Square[][] squares = new Square[8][8];
     private Square selectedPiece = null;
     private boolean whiteTurn = true;
@@ -35,10 +40,13 @@ public class Board extends JPanel implements MouseListener {
     /**
      * Create a new board
      */
-    public Board(Dimension rootSize) {
+    public Board(Dimension rootSize, String player1, String player2) {
         super();
 
         Board.rootSize = rootSize;
+        this.player1 = player1;
+        this.player2 = player2;
+        destinationFile = Util.rollSaveFilename(MainScreen.savePath, player1 + player2);
 
         // Set the size of the board
         //noinspection SuspiciousNameCombination
@@ -326,6 +334,7 @@ public class Board extends JPanel implements MouseListener {
             }
         }
 
+        result = 0;
         selectedPiece = null;
         whiteTurn = true;
         turnIsInCheck = false;
@@ -545,6 +554,7 @@ public class Board extends JPanel implements MouseListener {
 
     public void save() {
         save(new File(MainScreen.savePath, "kchess.sav"));
+        save(new File(destinationFile));
     }
 
     public void save(File fileName) {
@@ -553,6 +563,12 @@ public class Board extends JPanel implements MouseListener {
             //noinspection ResultOfMethodCallIgnored
             fileName.createNewFile();
             FileWriter saveFile = new FileWriter(fileName);
+
+            saveFile.write(player1 + "\n");
+            saveFile.write(player2 + "\n");
+            saveFile.write(destinationFile + "\n");
+
+            saveFile.write("---\n");
 
             for (Square[] row : squares) {
                 for (Square square : row) {
@@ -574,22 +590,32 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
-    public void load(File fileName) {
+    public static Board load(File fileName, Dimension rootSize) {
         // Load a save file called fileName defined as per above and load values from it
         try {
             Scanner saveFile = new Scanner(fileName);
 
-            for (Square[] row : squares) {
+            Board board = new Board(
+                rootSize,
+                saveFile.nextLine(),
+                saveFile.nextLine()
+            );
+
+            board.destinationFile = saveFile.nextLine();
+
+            saveFile.nextLine();
+
+            for (Square[] row : board.squares) {
                 for (Square square : row) {
                     square.setPiece(Integer.parseInt(saveFile.next()));
                 }
             }
 
-            whiteTurn = saveFile.next().equals("1");
-            kingsideCastling.put(true, saveFile.next().charAt(0) == '1');
-            queensideCastling.put(true, saveFile.next().charAt(0) == '1');
-            kingsideCastling.put(false, saveFile.next().charAt(0) == '1');
-            queensideCastling.put(false, saveFile.next().charAt(0) == '1');
+            board.whiteTurn = saveFile.next().equals("1");
+            board.kingsideCastling.put(true, saveFile.next().charAt(0) == '1');
+            board.queensideCastling.put(true, saveFile.next().charAt(0) == '1');
+            board.kingsideCastling.put(false, saveFile.next().charAt(0) == '1');
+            board.queensideCastling.put(false, saveFile.next().charAt(0) == '1');
 
             saveFile.nextLine();
             saveFile.nextLine();
@@ -597,15 +623,17 @@ public class Board extends JPanel implements MouseListener {
             String next;
             while (!(next = saveFile.nextLine()).equals("---")) {
                 if (!next.isEmpty())
-                    past.add(next);
+                    board.past.add(next);
             }
 
             while (!(next = saveFile.nextLine()).equals("---")) {
                 if (!next.isEmpty())
-                    future.add(next);
+                    board.future.add(next);
             }
+            return board;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            throw new RuntimeException("File not found");
         }
     }
 }

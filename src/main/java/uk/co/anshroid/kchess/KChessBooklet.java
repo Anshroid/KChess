@@ -110,7 +110,7 @@ public class KChessBooklet extends AbstractBooklet implements ActionListener {
         Font rootFont = new Font("Futura",Font.PLAIN, 10);
         root.setFont(rootFont);
 
-		MainScreen mainScreen = new MainScreen(root, KChessBooklet.this::endBooklet, "/mnt/us/");
+		MainScreen mainScreen = new MainScreen(root, KChessBooklet.this::endBooklet, "/mnt/us/kchess/");
         listComponentTree(root,"->");
 		mainScreen.start();
         // main screen is now referenced by Swing and a Thread.
