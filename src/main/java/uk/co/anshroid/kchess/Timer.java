@@ -4,9 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Timer extends JButton {
-    public Timer() {
+    public Timer(Dimension rootSize) {
         super();
-        setPreferredSize(new Dimension(MainUI.size.width / 5, MainUI.size.height / 14));
+        setPreferredSize(new Dimension(rootSize.width / 5, rootSize.height / 14));
         setText("5:00");
         setEnabled(false);
     }

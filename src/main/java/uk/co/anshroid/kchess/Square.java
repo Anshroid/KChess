@@ -75,7 +75,7 @@ public class Square extends JPanel {
             do {
                 f = base.deriveFont(Font.PLAIN, f.getSize() + 1);
                 fm = this.getFontMetrics(f);
-            } while (fm.stringWidth("♚") < (MainUI.size.width / 8) && fm.getHeight() < (MainUI.size.width / 8));
+            } while (fm.stringWidth("♚") < (Board.rootSize.width / 8) && fm.getHeight() < (Board.rootSize.width / 8));
 
             pieceLabel.setFont(f);
             add(pieceLabel);
@@ -352,7 +352,7 @@ public class Square extends JPanel {
             return; // Can't use image sprites on Kindle
         }
 
-        int size = MainUI.size.width / 8; // Piece size
+        int size = Board.rootSize.width / 8; // Piece size
         for (int i : new int[]{2, 3, 4, 5, 6, 7, 10, 11, 13, 14, 22, 26}) {
             try {
 //                 Load the sprite and scale it to the correct size (only works on desktop)

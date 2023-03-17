@@ -13,44 +13,29 @@ public class MainUI extends JPanel {
 
     public final JButton[] promotionButtons;
 
-    public static Dimension size;
-
-    /**
-     * Interface for the exit hook
-     */
-    public interface MainUIExit {
-        void exit();
-    }
-
     /**
      * Create a new MainUI
-     * @param root The root container to add this to
      * @param exitHook The exit hook to call when the app is exited
      */
-    public MainUI(Container root, MainUIExit exitHook, String savePath) {
+    public MainUI( MainScreen.ExitHook exitHook, Board board) {
         super();
-
-        if (!Util.isKindle()) {
-            // Use a default screen size for desktop
-            root.setSize(new Dimension(536, 721));
-        }
-
-        size = root.getSize();
 
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
 
+        //region Board
         // Add the board to the middle of the screen as fullwidth
-        board = new Board();
-        board.load(savePath + "kchess.sav");
+        this.board = board;
         c.gridx = 0;
         c.gridwidth = 2;
         c.gridy = 1;
         layout.setConstraints(board, c);
         add(board);
+        //endregion
 
+        //region Timers
         // Add the timers to the right of the screen on the top and bottom
-        Player2Timer = new Timer();
+        Player2Timer = new Timer(Board.rootSize);
         c.gridx = 1;
         c.gridwidth = 1;
         c.gridy = 0;
@@ -58,12 +43,14 @@ public class MainUI extends JPanel {
         layout.setConstraints(Player2Timer, c);
         add(Player2Timer);
 
-        Player1Timer = new Timer();
+        Player1Timer = new Timer(Board.rootSize);
         c.gridx = 1;
         c.gridy = 2;
         layout.setConstraints(Player1Timer, c);
         add(Player1Timer);
+        //endregion
 
+        //region Promotions
         // Add promotions to the left of the screen above the board
         JPanel promotions = new JPanel();
         c.gridx = 0;
@@ -83,7 +70,9 @@ public class MainUI extends JPanel {
             button.setEnabled(false);
             promotions.add(button);
         }
+        //endregion
 
+        //region Controls
         // Add controls to the left of the screen under the board
         JPanel controls = new JPanel();
         c.gridx = 0;
@@ -93,12 +82,8 @@ public class MainUI extends JPanel {
         add(controls);
 
         JButton exit = new JButton("Exit");
-        exit.addActionListener(e -> {board.save(savePath + "kchess.sav"); exitHook.exit();});
+        exit.addActionListener(e -> {board.save(); exitHook.exit();});
         controls.add(exit);
-
-        JButton reset = new JButton("Reset");
-        reset.addActionListener(e -> board.resetBoard());
-        controls.add(reset);
 
         JButton back = new JButton("Back");
         back.addActionListener(e -> board.movePast());
@@ -107,15 +92,10 @@ public class MainUI extends JPanel {
         JButton forward = new JButton("Forward");
         forward.addActionListener(e -> board.moveFuture());
         controls.add(forward);
-
-        JButton save = new JButton("Save");
-        save.addActionListener(e -> { String fn = Util.rollSaveFilename(savePath, "out"); board.save(fn); });
-        controls.add(save);
+        //endregion
 
         // Set up the UI
         this.setLayout(layout);
-        root.validate();
-        root.add(this);
     }
 
     /**

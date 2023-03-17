@@ -15,6 +15,8 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public class Board extends JPanel implements MouseListener {
+    public static Dimension rootSize;
+
     public final Square[][] squares = new Square[8][8];
     private Square selectedPiece = null;
     private boolean whiteTurn = true;
@@ -33,12 +35,14 @@ public class Board extends JPanel implements MouseListener {
     /**
      * Create a new board
      */
-    public Board() {
+    public Board(Dimension rootSize) {
         super();
+
+        Board.rootSize = rootSize;
 
         // Set the size of the board
         //noinspection SuspiciousNameCombination
-        setPreferredSize(new Dimension(MainUI.size.width, MainUI.size.width));
+        setPreferredSize(new Dimension(rootSize.width, rootSize.width));
         setLayout(new GridLayout(8, 8));
 
         // Create the squares
@@ -539,13 +543,16 @@ public class Board extends JPanel implements MouseListener {
         future.remove(future.size() - 1);
     }
 
-    public void save(String fileName) {
+    public void save() {
+        save(new File(MainScreen.savePath, "kchess.sav"));
+    }
+
+    public void save(File fileName) {
         // Create a save file called fileName and write the past and future moves to it separated by a hyphen
         try {
-            File file = new File(fileName);
             //noinspection ResultOfMethodCallIgnored
-            file.createNewFile();
-            FileWriter saveFile = new FileWriter(file);
+            fileName.createNewFile();
+            FileWriter saveFile = new FileWriter(fileName);
 
             for (Square[] row : squares) {
                 for (Square square : row) {
@@ -567,10 +574,10 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
-    public void load(String fileName) {
+    public void load(File fileName) {
         // Load a save file called fileName defined as per above and load values from it
         try {
-            Scanner saveFile = new Scanner(new File(fileName));
+            Scanner saveFile = new Scanner(fileName);
 
             for (Square[] row : squares) {
                 for (Square square : row) {
