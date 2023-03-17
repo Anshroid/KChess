@@ -27,6 +27,10 @@ public class MainScreen {
         void load(File saveFile);
     }
 
+    public interface LoadNewHook {
+        void loadNew(String player1Name, String player2Name);
+    }
+
     public MainScreen(Container root, ExitHook exitHook, String savePath) {
         this.root = root;
         mainExitHook = exitHook;
@@ -41,7 +45,7 @@ public class MainScreen {
         }
 
 
-        currentUI = new HomeUI(exitHook, savePath, this::LoadMainUI);
+        currentUI = new HomeUI(exitHook, savePath, this::LoadMainUI, this::LoadMainUINew);
         root.add(currentUI);
         root.validate();
         root.setVisible(true);
@@ -52,11 +56,23 @@ public class MainScreen {
         log.info("Started");
     }
 
+    public void LoadMainUINew(String player1Name, String player2Name) {
+        root.remove(currentUI);
+        currentUI = new MainUI(() -> {
+            root.remove(currentUI);
+            currentUI = new HomeUI(mainExitHook, savePath, this::LoadMainUI, this::LoadMainUINew);
+            root.add(currentUI);
+            root.validate();
+        }, new Board(root.getSize(), player1Name, player2Name));
+        root.add(currentUI);
+        root.validate();
+    }
+
     public void LoadMainUI(File saveFile) {
         root.remove(currentUI);
         currentUI = new MainUI(() -> {
             root.remove(currentUI);
-            currentUI = new HomeUI(mainExitHook, savePath, this::LoadMainUI);
+            currentUI = new HomeUI(mainExitHook, savePath, this::LoadMainUI, this::LoadMainUINew);
             root.add(currentUI);
             root.validate();
         }, Board.load(saveFile, root.getSize()));
