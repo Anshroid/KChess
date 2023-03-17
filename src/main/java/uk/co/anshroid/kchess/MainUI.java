@@ -27,24 +27,38 @@ public class MainUI extends JPanel {
         // Add the board to the middle of the screen as fullwidth
         this.board = board;
         c.gridx = 0;
-        c.gridwidth = 2;
+        c.gridwidth = 3;
         c.gridy = 1;
         layout.setConstraints(board, c);
         add(board);
         //endregion
 
+        //region Player Names
+        JLabel Player2Name = new JLabel(board.player2);
+        Player2Name.setFont(new Font("Arial", Font.BOLD, 20));
+        c.gridwidth = 1;
+        c.gridx = 1;
+        c.gridy = 0;
+        layout.setConstraints(Player2Name, c);
+        add(Player2Name);
+
+        JLabel Player1Name = new JLabel(board.player1);
+        Player1Name.setFont(new Font("Arial", Font.BOLD, 20));
+        c.gridy = 2;
+        layout.setConstraints(Player1Name, c);
+        add(Player1Name);
+        //endregion
+
         //region Timers
         // Add the timers to the right of the screen on the top and bottom
         Player2Timer = new Timer(Board.rootSize);
-        c.gridx = 1;
-        c.gridwidth = 1;
+        c.gridx = 2;
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
         layout.setConstraints(Player2Timer, c);
         add(Player2Timer);
 
         Player1Timer = new Timer(Board.rootSize);
-        c.gridx = 1;
         c.gridy = 2;
         layout.setConstraints(Player1Timer, c);
         add(Player1Timer);
