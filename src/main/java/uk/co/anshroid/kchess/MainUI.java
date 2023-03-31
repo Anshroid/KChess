@@ -11,6 +11,9 @@ public class MainUI extends JPanel {
     public final Timer Player2Timer;
     public final Timer Player1Timer;
 
+    public final JLabel Player2Material;
+    public final JLabel Player1Material;
+
     public final JButton[] promotionButtons;
 
     /**
@@ -47,6 +50,20 @@ public class MainUI extends JPanel {
         c.gridy = 2;
         layout.setConstraints(Player1Name, c);
         add(Player1Name);
+        //endregion
+
+        //region Material
+        Player2Material = new JLabel("");
+        c.gridx = 2;
+        c.gridy = 0;
+        layout.setConstraints(Player2Material, c);
+        add(Player2Material);
+
+        Player1Material = new JLabel("");
+        c.gridy = 2;
+        layout.setConstraints(Player1Material, c);
+        add(Player1Material);
+        board.endTurn();
         //endregion
 
         //region Timers
@@ -113,12 +130,32 @@ public class MainUI extends JPanel {
     }
 
     /**
-     * Set the timer text after the game has been won
-     * @param side The side that won the game
+     * Set the metadata for the game after it has ended
+     * @param reason The reason for the game ending
      */
-    public void endGame(Boolean side) {
-        (side ? Player2Timer : Player1Timer).setText("WINNER");
-        (side ? Player1Timer : Player2Timer).setText("GGWP");
+    public void endGame(EndGameReason reason) {
+        switch (reason) {
+            case WHITE_WIN:
+                Player1Timer.setText("WINNER");
+                Player2Timer.setText("LOSER");
+                break;
+            case BLACK_WIN:
+                Player1Timer.setText("LOSER");
+                Player2Timer.setText("WINNER");
+                break;
+            case STALEMATE:
+                Player1Timer.setText("STALEMATE");
+                Player2Timer.setText("STALEMATE");
+                break;
+            case FIFTY_MOVE_RULE:
+                Player1Timer.setText("FIFTY MOVE RULE");
+                Player2Timer.setText("FIFTY MOVE RULE");
+                break;
+            case INSUFFICIENT_MATERIAL:
+                Player1Timer.setText("INSUFFICIENT MATERIAL");
+                Player2Timer.setText("INSUFFICIENT MATERIAL");
+                break;
+        }
     }
 
     /**

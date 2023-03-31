@@ -31,6 +31,22 @@ public class Square extends JPanel {
         put(26, "♜");
     }};
 
+    public static final HashMap<Integer, Integer> pieceValue = new HashMap<Integer, Integer>() {{
+        put(-1, 0);
+        put(2, 1);
+        put(4, 1);
+        put(3, 0);
+        put(6, 0);
+        put(5, 9);
+        put(10, 9);
+        put(7, 3);
+        put(14, 3);
+        put(11, 3);
+        put(22, 3);
+        put(13, 5);
+        put(26, 5);
+    }};
+
     public JLabel pieceLabel = new JLabel();
 
     final Board board;
