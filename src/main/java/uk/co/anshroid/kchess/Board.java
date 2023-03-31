@@ -163,15 +163,18 @@ public class Board extends JPanel implements MouseListener {
      * Check if it is a checkmate
      */
     private void checkMate() {
-        if (turnIsInCheck) {
-            for (Square[] row : squares) {
-                    for (Square piece : row) {
-                        if (piece.isWhite() == whiteTurn && piece.getLegalMoves().size() > 0) {
-                            return;
-                        }
+        for (Square[] row : squares) {
+                for (Square piece : row) {
+                    if (piece.isWhite() == whiteTurn && piece.getLegalMoves().size() > 0) {
+                        return;
                     }
-            }
-            ((MainUI) getParent()).endGame(whiteTurn);
+                }
+        }
+
+        if (turnIsInCheck) {
+            ((MainUI) getParent()).endGame(whiteTurn ? EndGameReason.BLACK_WIN : EndGameReason.WHITE_WIN);
+        } else {
+            ((MainUI) getParent()).endGame(EndGameReason.STALEMATE);
         }
     }
 

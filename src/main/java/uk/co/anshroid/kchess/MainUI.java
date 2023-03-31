@@ -113,12 +113,24 @@ public class MainUI extends JPanel {
     }
 
     /**
-     * Set the timer text after the game has been won
-     * @param side The side that won the game
+     * Set the metadata for the game after it has ended
+     * @param reason The reason for the game ending
      */
-    public void endGame(Boolean side) {
-        (side ? Player2Timer : Player1Timer).setText("WINNER");
-        (side ? Player1Timer : Player2Timer).setText("GGWP");
+    public void endGame(EndGameReason reason) {
+        switch (reason) {
+            case WHITE_WIN:
+                Player1Timer.setText("WINNER");
+                Player2Timer.setText("LOSER");
+                break;
+            case BLACK_WIN:
+                Player1Timer.setText("LOSER");
+                Player2Timer.setText("WINNER");
+                break;
+            case STALEMATE:
+                Player1Timer.setText("STALEMATE");
+                Player2Timer.setText("STALEMATE");
+                break;
+        }
     }
 
     /**
