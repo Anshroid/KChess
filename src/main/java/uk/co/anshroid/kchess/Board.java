@@ -23,6 +23,8 @@ public class Board extends JPanel implements MouseListener {
     public int result;
 
     public int fiftyMoveRuleCounter = 0;
+    public int blackMaterial = 0;
+    public int whiteMaterial = 0;
 
     public final Square[][] squares = new Square[8][8];
     private Square selectedPiece = null;
@@ -129,6 +131,12 @@ public class Board extends JPanel implements MouseListener {
             if (selectedPiece.piece == (whiteTurn ? 2 : 4) || squareHasPiece) fiftyMoveRuleCounter = 0;
             else fiftyMoveRuleCounter++;
 
+            // Update the material counters
+            if (squareHasPiece) {
+                if (square.isWhite()) whiteMaterial -= Square.pieceValue.get(square.piece);
+                else blackMaterial -= Square.pieceValue.get(square.piece);
+            }
+
             // Move the piece
             square.setPiece(selectedPiece.piece);
             selectedPiece.setPiece(-1);
@@ -169,11 +177,23 @@ public class Board extends JPanel implements MouseListener {
      * Check if it is a checkmate
      */
     private void checkEndings() {
+        // Check if the fifty-move rule has been reached
         if (fiftyMoveRuleCounter >= 100) {
             ((MainUI) getParent()).endGame(EndGameReason.FIFTY_MOVE_RULE);
             return;
         }
 
+        // Check for insufficient material
+        if (
+                whiteMaterial == 0 && blackMaterial == 0 ||
+                whiteMaterial == 3 && blackMaterial == 0 ||
+                whiteMaterial == 0 && blackMaterial == 3
+        ) {
+            ((MainUI) getParent()).endGame(EndGameReason.INSUFFICIENT_MATERIAL);
+            return;
+        }
+
+        // Check if there are no legal moves
         for (Square[] row : squares) {
                 for (Square piece : row) {
                     if (piece.isWhite() == whiteTurn && piece.getLegalMoves().size() > 0) {
@@ -218,11 +238,24 @@ public class Board extends JPanel implements MouseListener {
         checkEndings();
     }
 
-    private void endTurn() {
+    void endTurn() {
         clearChecks();
         turnIsInCheck = computeChecks(whiteTurn, kings.get(whiteTurn).pos);
         if (turnIsInCheck) {
             kings.get(whiteTurn).setCheck(true);
+        }
+
+        // Material update
+        int materialDiff = whiteMaterial - blackMaterial;
+        if (materialDiff > 0) {
+            ((MainUI) getParent()).Player1Material.setText("+" + materialDiff);
+            ((MainUI) getParent()).Player2Material.setText("");
+        } else if (materialDiff == 0) {
+            ((MainUI) getParent()).Player1Material.setText("");
+            ((MainUI) getParent()).Player2Material.setText("");
+        } else {
+            ((MainUI) getParent()).Player1Material.setText("");
+            ((MainUI) getParent()).Player2Material.setText("+" + -materialDiff);
         }
     }
 
@@ -352,6 +385,9 @@ public class Board extends JPanel implements MouseListener {
         selectedPiece = null;
         whiteTurn = true;
         turnIsInCheck = false;
+        fiftyMoveRuleCounter = 0;
+        whiteMaterial = 39;
+        blackMaterial = 39;
         kings.put(true, getSquareAt(new Util.Tuple<>(5, 1)));
         kings.put(false, getSquareAt(new Util.Tuple<>(5, 8)));
         kingsideCastling.put(true, true);
@@ -464,6 +500,13 @@ public class Board extends JPanel implements MouseListener {
         getSquareAt(new Util.Tuple<>(Integer.parseInt(toPos[0]), Integer.parseInt(toPos[1]))).setPiece(Integer.parseInt(to[0]));
         getSquareAt(new Util.Tuple<>(Integer.parseInt(fromPos[0]), Integer.parseInt(fromPos[1]))).setPiece(Integer.parseInt(from[0]));
 
+        // Update Material counters
+        if (whiteTurn) {
+            whiteMaterial += Square.pieceValue.get(Integer.parseInt(to[0]));
+        } else {
+            blackMaterial += Square.pieceValue.get(Integer.parseInt(to[0]));
+        }
+
         whiteTurn = !whiteTurn;
 
         if (Integer.parseInt(from[0]) == (whiteTurn ? 3 : 6)) {
@@ -522,6 +565,13 @@ public class Board extends JPanel implements MouseListener {
 
         getSquareAt(new Util.Tuple<>(Integer.parseInt(toPos[0]), Integer.parseInt(toPos[1]))).setPiece(Integer.parseInt(from[0]));
         getSquareAt(new Util.Tuple<>(Integer.parseInt(fromPos[0]), Integer.parseInt(fromPos[1]))).setPiece(-1);
+
+        // Update Material counters
+        if (whiteTurn) {
+            blackMaterial -= Square.pieceValue.get(Integer.parseInt(to[0]));
+        } else {
+            whiteMaterial -= Square.pieceValue.get(Integer.parseInt(to[0]));
+        }
 
         if (Integer.parseInt(from[0]) == (whiteTurn ? 3 : 6)) {
             kings.put(whiteTurn, getSquareAt(new Util.Tuple<>(Integer.parseInt(toPos[0]), Integer.parseInt(toPos[1]))));
@@ -595,6 +645,9 @@ public class Board extends JPanel implements MouseListener {
             saveFile.write((whiteTurn ? "1" : "0") + "\n");
             saveFile.write((kingsideCastling.get(true) ? "1" : "0") + " " + (queensideCastling.get(true) ? "1" : "0") + "\n");
             saveFile.write((kingsideCastling.get(false) ? "1" : "0") + " " + (queensideCastling.get(false) ? "1" : "0") + "\n");
+            saveFile.write(kings.get(true).pos.x + " " + kings.get(true).pos.y + "\n");
+            saveFile.write(kings.get(false).pos.x + " " + kings.get(false).pos.y + "\n");
+            saveFile.write(whiteMaterial + " " + blackMaterial + "\n");
 
             saveFile.write("---\n");
 
@@ -632,6 +685,10 @@ public class Board extends JPanel implements MouseListener {
             board.queensideCastling.put(true, saveFile.next().charAt(0) == '1');
             board.kingsideCastling.put(false, saveFile.next().charAt(0) == '1');
             board.queensideCastling.put(false, saveFile.next().charAt(0) == '1');
+            board.kings.put(true, board.getSquareAt(new Util.Tuple<>(Integer.parseInt(saveFile.next()), Integer.parseInt(saveFile.next()))));
+            board.kings.put(false, board.getSquareAt(new Util.Tuple<>(Integer.parseInt(saveFile.next()), Integer.parseInt(saveFile.next()))));
+            board.whiteMaterial = Integer.parseInt(saveFile.next());
+            board.blackMaterial = Integer.parseInt(saveFile.next());
 
             saveFile.nextLine();
             saveFile.nextLine();
@@ -646,6 +703,7 @@ public class Board extends JPanel implements MouseListener {
                 if (!next.isEmpty())
                     board.future.add(next);
             }
+
             return board;
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -11,6 +11,9 @@ public class MainUI extends JPanel {
     public final Timer Player2Timer;
     public final Timer Player1Timer;
 
+    public final JLabel Player2Material;
+    public final JLabel Player1Material;
+
     public final JButton[] promotionButtons;
 
     /**
@@ -47,6 +50,20 @@ public class MainUI extends JPanel {
         c.gridy = 2;
         layout.setConstraints(Player1Name, c);
         add(Player1Name);
+        //endregion
+
+        //region Material
+        Player2Material = new JLabel("");
+        c.gridx = 2;
+        c.gridy = 0;
+        layout.setConstraints(Player2Material, c);
+        add(Player2Material);
+
+        Player1Material = new JLabel("");
+        c.gridy = 2;
+        layout.setConstraints(Player1Material, c);
+        add(Player1Material);
+        board.endTurn();
         //endregion
 
         //region Timers
@@ -133,6 +150,10 @@ public class MainUI extends JPanel {
             case FIFTY_MOVE_RULE:
                 Player1Timer.setText("FIFTY MOVE RULE");
                 Player2Timer.setText("FIFTY MOVE RULE");
+                break;
+            case INSUFFICIENT_MATERIAL:
+                Player1Timer.setText("INSUFFICIENT MATERIAL");
+                Player2Timer.setText("INSUFFICIENT MATERIAL");
                 break;
         }
     }
