@@ -130,6 +130,10 @@ public class MainUI extends JPanel {
                 Player1Timer.setText("STALEMATE");
                 Player2Timer.setText("STALEMATE");
                 break;
+            case FIFTY_MOVE_RULE:
+                Player1Timer.setText("FIFTY MOVE RULE");
+                Player2Timer.setText("FIFTY MOVE RULE");
+                break;
         }
     }
 

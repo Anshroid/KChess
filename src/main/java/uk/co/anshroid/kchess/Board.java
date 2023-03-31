@@ -22,6 +22,8 @@ public class Board extends JPanel implements MouseListener {
     public String player2;
     public int result;
 
+    public int fiftyMoveRuleCounter = 0;
+
     public final Square[][] squares = new Square[8][8];
     private Square selectedPiece = null;
     private boolean whiteTurn = true;
@@ -123,6 +125,10 @@ public class Board extends JPanel implements MouseListener {
             }
 
 
+            // Update the fifty-move rule counter
+            if (selectedPiece.piece == (whiteTurn ? 2 : 4) || squareHasPiece) fiftyMoveRuleCounter = 0;
+            else fiftyMoveRuleCounter++;
+
             // Move the piece
             square.setPiece(selectedPiece.piece);
             selectedPiece.setPiece(-1);
@@ -140,7 +146,7 @@ public class Board extends JPanel implements MouseListener {
             // End the turn
             whiteTurn = !whiteTurn;
             endTurn();
-            checkMate();
+            checkEndings();
             return;
         }
 
@@ -162,7 +168,12 @@ public class Board extends JPanel implements MouseListener {
     /**
      * Check if it is a checkmate
      */
-    private void checkMate() {
+    private void checkEndings() {
+        if (fiftyMoveRuleCounter >= 100) {
+            ((MainUI) getParent()).endGame(EndGameReason.FIFTY_MOVE_RULE);
+            return;
+        }
+
         for (Square[] row : squares) {
                 for (Square piece : row) {
                     if (piece.isWhite() == whiteTurn && piece.getLegalMoves().size() > 0) {
@@ -204,7 +215,7 @@ public class Board extends JPanel implements MouseListener {
         promotionSquare = null;
         whiteTurn = !whiteTurn;
         endTurn();
-        checkMate();
+        checkEndings();
     }
 
     private void endTurn() {
@@ -570,6 +581,7 @@ public class Board extends JPanel implements MouseListener {
             saveFile.write(player1 + "\n");
             saveFile.write(player2 + "\n");
             saveFile.write(destinationFile + "\n");
+            saveFile.write(fiftyMoveRuleCounter + "\n");
 
             saveFile.write("---\n");
 
@@ -605,6 +617,7 @@ public class Board extends JPanel implements MouseListener {
             );
 
             board.destinationFile = saveFile.nextLine();
+            board.fiftyMoveRuleCounter = Integer.parseInt(saveFile.nextLine());
 
             saveFile.nextLine();
 

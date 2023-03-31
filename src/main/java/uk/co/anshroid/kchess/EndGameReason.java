@@ -6,5 +6,5 @@ public enum EndGameReason {
     STALEMATE,
     RESIGNATION,
     TIMEOUT,
-    DRAW
+    FIFTY_MOVE_RULE, DRAW
 }
