@@ -489,7 +489,7 @@ public class Board extends JPanel implements MouseListener {
         clearDots();
         selectedPiece = null;
 
-        String moveStr = past.get(past.size() - 1);
+        String moveStr = past.remove(past.size() - 1);
 
         String[] parts = moveStr.split("m");
         String[] to = parts[1].split("\\|");
@@ -543,8 +543,7 @@ public class Board extends JPanel implements MouseListener {
         endTurn();
         repaint();
 
-        past.remove(past.size() - 1);
-        future.add(moveStr);
+        future.add(0, moveStr);
     }
 
     public void moveFuture() {
@@ -555,7 +554,7 @@ public class Board extends JPanel implements MouseListener {
         clearDots();
         selectedPiece = null;
 
-        String moveStr = future.get(future.size() - 1);
+        String moveStr = future.remove(0);
 
         String[] parts = moveStr.split("m");
         String[] to = parts[1].split("\\|");
@@ -613,7 +612,6 @@ public class Board extends JPanel implements MouseListener {
         repaint();
 
         past.add(moveStr);
-        future.remove(future.size() - 1);
     }
 
     public void save() {
